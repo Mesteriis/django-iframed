@@ -40,11 +40,11 @@ class IframedMiddlewareTest(TestCase):
         request = self.factory.get('/appnameignored/viewnameignored', **{
             'HTTP_REFERER': 'http://www.referer.com/refererpath/?id=/viewparams/moreparams'
         })
-        expected_path_info = '/appname/viewname/viewparams/moreparams'
         with patch_settings(**settings):
             middleware = IframedMiddleware()
             middleware.process_request(request)
-            
+
+            expected_path_info = '/appname/viewname/viewparams/moreparams'
             self.assertEqual(request.path_info, expected_path_info)
 
     def test_process_request_no_mappings(self):
@@ -53,11 +53,11 @@ class IframedMiddlewareTest(TestCase):
         request = self.factory.get('/appnameoriginal/viewnameoriginal', **{
             'HTTP_REFERER': 'http://www.referer.com/refererpath/?id=/viewparams/moreparams'
         })
-        expected_path_info = '/appnameoriginal/viewnameoriginal'
         with patch_settings(**settings):
             middleware = IframedMiddleware()
             middleware.process_request(request)
-            
+
+            expected_path_info = '/appnameoriginal/viewnameoriginal'
             self.assertEqual(request.path_info, expected_path_info)
 
     def test_process_request_aliased(self):
@@ -72,11 +72,11 @@ class IframedMiddlewareTest(TestCase):
         request = self.factory.get('/appnamehonoured/viewnamehonoured', **{
             'HTTP_REFERER': 'http://www.referer.com/alternative_location/?id=/viewparamsignored/moreparamsignored'
         })
-        expected_path_info = '/appnamehonoured/viewnamehonoured'
         with patch_settings(**settings):
             middleware = IframedMiddleware()
             middleware.process_request(request)
-            
+
+            expected_path_info = '/appnamehonoured/viewnamehonoured'
             self.assertEqual(request.path_info, expected_path_info)
 
     def test_process_request_explicit_query_id(self):
@@ -89,11 +89,11 @@ class IframedMiddlewareTest(TestCase):
         request = self.factory.get('/appnameignored/viewnameignored', **{
             'HTTP_REFERER': 'http://www.referer.com/refererpath/?url=/viewparams/moreparams'
         })
-        expected_path_info = '/appname/viewname/viewparams/moreparams'
         with patch_settings(**settings):
             middleware = IframedMiddleware()
             middleware.process_request(request)
-            
+
+            expected_path_info = '/appname/viewname/viewparams/moreparams'
             self.assertEqual(request.path_info, expected_path_info)
 
 
@@ -117,17 +117,17 @@ class IframedReverseTest(TestCase):
                 ('/appname/viewname', '/refererpath'),
             ]
         }
-        
+
         request = self.factory.get('/appnameignored/viewnameignored', **{
             'HTTP_REFERER': 'http://www.referer.com/refererpath/?id=/viewparams/moreparams'
         })
-        expected_result = 'http://www.referer.com/refererpath?id=/param'
-        
         with patch_settings(**settings):
             reload(urlresolvers)
             middleware = IframedMiddleware()
             middleware.process_request(request)
             result = urlresolvers.reverse('test', request=request,  args=['param'])
+            expected_result = 'http://www.referer.com/refererpath?id=/param'
+
             self.assertEqual(result, expected_result)
         
     def test_reverse_without_mapping(self):
@@ -137,10 +137,10 @@ class IframedReverseTest(TestCase):
                 ('/appname/viewname', '/refererpath'),
             ]
         }
-        expected_result = '/appname/viewname/param'
         with patch_settings(**settings):
             reload(urlresolvers)
             result = urlresolvers.reverse('test',  args=['param'])
+            expected_result = '/appname/viewname/param'
             self.assertEqual(result, expected_result)
 
     def test_reverse_without_mapping_using_default_base(self):
@@ -151,10 +151,10 @@ class IframedReverseTest(TestCase):
                 ('/appname/viewname', '/refererpath'),
             ]
         }
-        expected_result = 'http://parentdomain.com/refererpath?id=/param'
         with patch_settings(**settings):
             reload(urlresolvers)
             result = urlresolvers.reverse('test', use_default_base=True,  args=['param'])
+            expected_result = 'http://parentdomain.com/refererpath?id=/param'
             self.assertEqual(result, expected_result)
     
     def test_reverse_with_rewrite(self):
@@ -167,11 +167,11 @@ class IframedReverseTest(TestCase):
                 ('/appname/viewname', '/refererpath'),
             ]
         }
-        
-        expected_result = 'http://www.otherdomain/arbitrarypath/'
-        
+
         with patch_settings(**settings):
             reload(urlresolvers)
             result = urlresolvers.reverse('test', args=[''])
+            expected_result = 'http://www.otherdomain/arbitrarypath/'
+
             self.assertEqual(result, expected_result)
         
